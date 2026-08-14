@@ -1,0 +1,33 @@
+<?php
+// This file is generated. Do not modify it manually.
+return array(
+	'what-im-reading' => array(
+		'$schema' => 'https://schemas.wp.org/trunk/block.json',
+		'apiVersion' => 3,
+		'name' => 'what-im-reading/what-im-reading',
+		'version' => '0.1.0',
+		'title' => 'What I\'m Reading',
+		'category' => 'design',
+		'icon' => 'book',
+		'description' => 'ACF WordPress Gutenberg block that shows what book the author is currently reading.',
+		'example' => array(
+			
+		),
+		'supports' => array(
+			'color' => array(
+				'background' => true,
+				'text' => true
+			),
+			'typography' => array(
+				'fontSize' => true
+			),
+			'html' => false
+		),
+		'textdomain' => 'what-im-reading',
+		'editorScript' => 'file:./index.js',
+		'editorStyle' => 'file:./index.css',
+		'style' => 'file:./style-index.css',
+		'render' => 'file:./render.php',
+		'viewScript' => 'file:./view.js'
+	)
+);

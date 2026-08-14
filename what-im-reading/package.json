@@ -1,0 +1,26 @@
+{
+	"name": "what-im-reading",
+	"version": "0.1.0",
+	"description": "ACF WordPress Gutenberg block that shows what book the author is currently reading. ",
+	"author": "Rafał Myśliwczyk",
+	"license": "GPL-2.0-or-later",
+	"homepage": "mysliwczykrafal.pl",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build --webpack-copy-php --blocks-manifest",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start --webpack-copy-php --blocks-manifest"
+	},
+	"dependencies": {
+		"@wordpress/block-editor": "latest",
+		"@wordpress/blocks": "latest",
+		"@wordpress/i18n": "latest"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^34.1.0"
+	}
+}
