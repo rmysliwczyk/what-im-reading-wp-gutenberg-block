@@ -16,7 +16,7 @@ jobs:
         filename: 'what-im-reading.zip'
         directory: 'what-im-reading'
         exclusions: '*.git* /*node_modules/* .editorconfig package.json package-lock.json /*src/* readme.txt'
-    - name: Set outputs
+    - name: 'Set outputs'
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
     - name: Upload Release
