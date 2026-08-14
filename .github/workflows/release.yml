@@ -1,0 +1,27 @@
+name: Release
+on: [push]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Archive Release
+      uses: thedoctor0/zip-release@0.7.5
+      with:
+        type: 'zip'
+        filename: 'what-im-reading.zip'
+        directory: 'what-im-reading'
+        exclusions: '*.git* /*node_modules/* .editorconfig package.json package-lock.json /*src/* readme.txt'
+    - name: Upload Release
+      uses: ncipollo/release-action@v1.12.0
+      with:
+        artifacts: "what-im-reading/what-im-reading.zip"
+        tag: 'latest'
+        allowUpdates: true
+        replacesArtifacts: true
+        removeArtifacts: true
+        token: ${{ secrets.GITHUB_TOKEN }}
