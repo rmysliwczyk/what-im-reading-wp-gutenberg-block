@@ -27,10 +27,22 @@ import './editor.scss';
  *
  * @return {Element} Element to render.
  */
-export default function Edit() {
+export default function Edit({attributes, setAttributes}) {
 	return (
-		<p { ...useBlockProps() }>
-			<p>My 'editor view' code will go here</p>
-		</p>
+		<>
+			<section { ...useBlockProps() }>
+				<h2>{"I'm currently reading:"}</h2>
+				<p>This component will be rendered properly after editing is complete. Below are needed ACF fields and their settings.</p>
+
+				<h3>Book Image:</h3>
+				<p>Type: Image, Field Name: book_image, Return Format: Image ID</p>
+
+				<h3>Book Title:</h3>
+				<p>Type: Text, Field Name: book_title</p>
+
+				<h3>Link to Book:</h3>
+				<p>Type: Link, Field Name: book_link, Return Format: Link URL</p>
+			</section>
+		</>
 	);
 }
