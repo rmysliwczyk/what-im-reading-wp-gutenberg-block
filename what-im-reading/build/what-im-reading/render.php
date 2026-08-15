@@ -29,8 +29,8 @@
 
 	if(is_array($book_link)) {
 		/* Link Return Type: 'Link Array' */
-		$book_link_href = $book_link['url'] ?? '#';
-		$book_link_title = $book_link['title'] ?? $book_link_href;
+		$book_link_href = $book_link['url'] ?:'#';
+		$book_link_title = $book_link['title'] ?: $book_link_href;
 	} else {
 		/* Link Return Type: 'Link URL' */
 		$book_link_href = $book_link;
@@ -39,11 +39,9 @@
 ?>
 <section <?php echo get_block_wrapper_attributes(); ?>>
 	<h2>I'm currently reading:</h2>
-	<?php echo var_export($attributes)?>
-<br>
-	<?php echo var_export($book_link)?>
-<br>
 	<?php echo wp_get_attachment_image( $book_image, 'medium')?>
-	<p><?=$book_title?></p>
-	<a href=<?=$book_link_href?>><?=$book_link_title?></a>
+	<p><?= esc_html($book_title) ?></p>
+	<a href="<?= esc_url($book_link_href)?>">
+		<?= esc_html($book_link_title)?>
+	</a>
 </section>
