@@ -30,14 +30,22 @@ import './editor.scss';
 
 import { Panel, PanelBody, PanelRow } from '@wordpress/components';
 import { SelectControl } from '@wordpress/components';
+import { resolveSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 import { useState, useEffect } from 'react';
 
 export default function Edit({attributes, setAttributes}) {
+	const blockProps = useBlockProps();
 	const {bookTitleACFKey, bookImageACFKey, bookLinkACFKey} = attributes;
 	const [errorMessage, setErrorMessage] = useState();
 	const [ACFFields, setACFFields] = useState({text: [], image: [], link: []})
-	const blockProps = useBlockProps();
-
+	const [PreviewFields, setPreviewFields] = useState(
+		{
+			text: <p>Book Title</p>,
+			image: <img src='#' alt='Book Image'/>,
+			link: <a href='#'>Book Link</a>
+		}
+	)
 
 	useEffect(() => {
 		if (typeof acf !== 'undefined') {
@@ -51,6 +59,42 @@ export default function Edit({attributes, setAttributes}) {
 		}
 	},[])
 
+	useEffect(() => {
+		async function updatePreview() {
+			if (bookImageACFKey) {
+				console.log(bookImageACFKey)
+				let bookImage = acf.getFields({name: bookImageACFKey})[0]?.val();
+				const media = await resolveSelect(coreDataStore).getEntityRecord('postType', 'attachment', bookImage)
+				setPreviewFields((prev) => ({...prev, image: <img src={media?.media_details?.sizes?.medium?.source_url}/>}))
+			}
+
+			if (bookTitleACFKey) {
+				let bookTitle = acf.getFields({name: bookTitleACFKey})[0]?.val();
+				setPreviewFields((prev) => ({...prev, text: <p>{bookTitle}</p>}))
+			}
+
+			if (bookLinkACFKey) {
+				let bookLink = acf.getFields({name: bookLinkACFKey})[0]?.val();
+
+				let bookLinkHref
+				let bookLinkTitle
+				if (bookLink.url) {
+					/* Link Return Type: 'Link Array' */
+					bookLinkHref = bookLink.url
+					bookLinkTitle = bookLink.title ? bookLink.title : bookLinkHref
+				} else {
+					/* Link Return Type: 'Link URL' */
+					bookLinkHref = bookLink
+					bookLinkTitle = bookLink
+				}
+				setPreviewFields((prev) => ({...prev, link: <a href={bookLinkHref}>{bookLinkTitle}</a>}))
+			}
+		}
+
+		updatePreview()
+
+	},[bookTitleACFKey, bookImageACFKey, bookLinkACFKey])
+
 	return (
 		<>
 			{!errorMessage ? (
@@ -62,19 +106,19 @@ export default function Edit({attributes, setAttributes}) {
 				<SelectControl
 					label="Book Image"
 					value={ bookImageACFKey }
-					options={ [{label: "No key selected", value: null}, ...ACFFields.image] }
+					options={ [{label: "No key selected", value: ""}, ...ACFFields.image] }
 					onChange={ ( value ) => setAttributes({ bookImageACFKey: value }) }
 				/>
 				<SelectControl
 					label="Book Title"
 					value={ bookTitleACFKey }
-					options={ [{label: "No key selected", value: null}, ...ACFFields.text]}
+					options={ [{label: "No key selected", value: ""}, ...ACFFields.text]}
 					onChange={ ( value ) => setAttributes({ bookTitleACFKey: value }) }
 				/>
 				<SelectControl
 					label="Book Link"
 					value={ bookLinkACFKey }
-					options={ [{label: "No key selected", value: null}, ...ACFFields.link]}
+					options={ [{label: "No key selected", value: ""}, ...ACFFields.link]}
 					onChange={ ( value ) => setAttributes({ bookLinkACFKey: value }) }
 				/>
 			</PanelBody>
@@ -82,6 +126,9 @@ export default function Edit({attributes, setAttributes}) {
 			</InspectorControls>
 			<section { ...blockProps }>
 				<h2>{"I'm currently reading:"}</h2>
+				{PreviewFields.image}
+				{PreviewFields.text}
+				{PreviewFields.link}
 			</section>
 			</> ) : (
 			<section {...blockProps} >
