@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls, InnerBlocks} from '@wordpress/block-editor';
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
  * Those files can contain any CSS code that gets applied to the editor.
@@ -27,22 +27,114 @@ import './editor.scss';
  *
  * @return {Element} Element to render.
  */
+
+import { Panel, PanelBody, PanelRow } from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
+import { resolveSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useState, useEffect } from 'react';
+
 export default function Edit({attributes, setAttributes}) {
+	const blockProps = useBlockProps();
+	const {bookTitleACFKey, bookImageACFKey, bookLinkACFKey} = attributes;
+	const [errorMessage, setErrorMessage] = useState();
+	const [ACFFields, setACFFields] = useState({text: [], image: [], link: []})
+	const [PreviewFields, setPreviewFields] = useState(
+		{
+			text: <p>Book Title</p>,
+			image: <img src='#' alt='Book Image'/>,
+			link: <a href='#'>Book Link</a>
+		}
+	)
+
+	useEffect(() => {
+		if (typeof acf !== 'undefined') {
+			setACFFields({
+				text: acf.getFields({type: 'text'}).map((field) => ({label: field.data.name, value: field.data.name})),
+				image: acf.getFields({type: 'image'}).map((field) => ({label: field.data.name, value: field.data.name})),
+				link: acf.getFields({type: 'link'}).map((field) => ({label: field.data.name, value: field.data.name}))
+			})
+		} else {
+			setErrorMessage('ACF Plugin is required to use this block.');
+		}
+	},[])
+
+	useEffect(() => {
+		async function updatePreview() {
+			if (bookImageACFKey) {
+				console.log(bookImageACFKey)
+				let bookImage = acf.getFields({name: bookImageACFKey})[0]?.val();
+				const media = await resolveSelect(coreDataStore).getEntityRecord('postType', 'attachment', bookImage)
+				setPreviewFields((prev) => ({...prev, image: <img src={media?.media_details?.sizes?.medium?.source_url}/>}))
+			}
+
+			if (bookTitleACFKey) {
+				let bookTitle = acf.getFields({name: bookTitleACFKey})[0]?.val();
+				setPreviewFields((prev) => ({...prev, text: <p>{bookTitle}</p>}))
+			}
+
+			if (bookLinkACFKey) {
+				let bookLink = acf.getFields({name: bookLinkACFKey})[0]?.val();
+
+				let bookLinkHref
+				let bookLinkTitle
+				if (bookLink.url) {
+					/* Link Return Type: 'Link Array' */
+					bookLinkHref = bookLink.url
+					bookLinkTitle = bookLink.title ? bookLink.title : bookLinkHref
+				} else {
+					/* Link Return Type: 'Link URL' */
+					bookLinkHref = bookLink
+					bookLinkTitle = bookLink
+				}
+				setPreviewFields((prev) => ({...prev, link: <a href={bookLinkHref}>{bookLinkTitle}</a>}))
+			}
+		}
+
+		updatePreview()
+
+	},[bookTitleACFKey, bookImageACFKey, bookLinkACFKey])
+
 	return (
 		<>
-			<section { ...useBlockProps() }>
+			{!errorMessage ? (
+			<>
+			<InspectorControls>
+			<Panel header="Settings">
+				<PanelBody title="ACF Fields" initialOpen={ true }>
+				<PanelRow>{"Select which ACF Fields to bind with the component"}</PanelRow>
+				<SelectControl
+					label="Book Image"
+					value={ bookImageACFKey }
+					options={ [{label: "No key selected", value: ""}, ...ACFFields.image] }
+					onChange={ ( value ) => setAttributes({ bookImageACFKey: value }) }
+				/>
+				<SelectControl
+					label="Book Title"
+					value={ bookTitleACFKey }
+					options={ [{label: "No key selected", value: ""}, ...ACFFields.text]}
+					onChange={ ( value ) => setAttributes({ bookTitleACFKey: value }) }
+				/>
+				<SelectControl
+					label="Book Link"
+					value={ bookLinkACFKey }
+					options={ [{label: "No key selected", value: ""}, ...ACFFields.link]}
+					onChange={ ( value ) => setAttributes({ bookLinkACFKey: value }) }
+				/>
+			</PanelBody>
+			</Panel>
+			</InspectorControls>
+			<section { ...blockProps }>
 				<h2>{"I'm currently reading:"}</h2>
-				<p>This component will be rendered properly after editing is complete. Below are needed ACF fields and their settings.</p>
-
-				<h3>Book Image:</h3>
-				<p>Type: Image, Field Name: book_image, Return Format: Image ID</p>
-
-				<h3>Book Title:</h3>
-				<p>Type: Text, Field Name: book_title</p>
-
-				<h3>Link to Book:</h3>
-				<p>Type: Link, Field Name: book_link, Return Format: Link URL</p>
+				{PreviewFields.image}
+				{PreviewFields.text}
+				{PreviewFields.link}
 			</section>
+			</> ) : (
+			<section {...blockProps} >
+				<p>{errorMessage}</p>
+			</section>
+			)}
 		</>
 	);
 }

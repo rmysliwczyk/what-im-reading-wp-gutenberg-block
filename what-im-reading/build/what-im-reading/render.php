@@ -12,39 +12,36 @@
 ?>
 
 <?php
-	/* I'm using ifs to check these further, because ACF doesn't show on 'Preview'*/
-	$book_image = get_field("book_image");
-	$book_title = get_field("book_title");
-	$book_link = get_field("book_link");
+	$book_title = get_field($attributes['bookTitleACFKey']);
+	$book_image = get_field($attributes['bookImageACFKey']);
+	$book_link = get_field($attributes['bookLinkACFKey']);
+
+	if(is_array($book_image)) {
+		/* Image Return Type: 'Image Array' */
+		$book_image = $book_image['id'];
+	} elseif (wp_http_validate_url($book_image)) {
+		/* Image Return Type: 'Image URL' */
+		$book_image = attachment_url_to_postid($book_image);
+	} else {
+		/* Image Return Type: 'Image ID' */
+		/* $book_image already is ID */
+	}
+
+	if(is_array($book_link)) {
+		/* Link Return Type: 'Link Array' */
+		$book_link_href = $book_link['url'] ?:'#';
+		$book_link_title = $book_link['title'] ?: $book_link_href;
+	} else {
+		/* Link Return Type: 'Link URL' */
+		$book_link_href = $book_link;
+		$book_link_title = $book_link_href;
+	}
 ?>
 <section <?php echo get_block_wrapper_attributes(); ?>>
 	<h2>I'm currently reading:</h2>
-	<?php if (!$book_image || !$book_title || !$book_link): ?>
-		<p>This component will be rendered properly after editing is complete. Below are needed ACF fields and their settings.</p>
-	<?php endif; ?>
-
-	<?php if ($book_image): ?>
-		<div>
-			<?php echo wp_get_attachment_image($book_image, 'medium'); ?>
-		</div>
-	<?php else: ?>
-		<h3>Book Image:</h3>
-		<p>Type: Image, Field Name: book_image, Return Format: Image ID</p>
-	<?php endif; ?>
-
-	<?php if ($book_title): ?>
-		<p><?=$book_title ?></p>
-	<?php else: ?>
-		<h3>Book Title:</h3>
-		<p>Type: Text, Field Name: book_title</p>
-	<?php endif; ?>
-
-	<?php if ($book_link): ?>
-		<p><a href=<?=$book_link?>>Link: lubieczytac.pl</a></p>
-	<?php else: ?>
-		<h3>Link to Book:</h3>
-		<p>Type: Link, Field Name: book_link, Return Format: Link URL</p>
-	<?php endif; ?>
-
-
+	<?php echo wp_get_attachment_image( $book_image, 'medium')?>
+	<p><?= esc_html($book_title) ?></p>
+	<a href="<?= esc_url($book_link_href)?>">
+		<?= esc_html($book_link_title)?>
+	</a>
 </section>
