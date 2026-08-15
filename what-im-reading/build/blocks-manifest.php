@@ -23,6 +23,17 @@ return array(
 			),
 			'html' => false
 		),
+		'attributes' => array(
+			'bookTitleACFKey' => array(
+				'type' => 'string'
+			),
+			'bookImageACFKey' => array(
+				'type' => 'string'
+			),
+			'bookLinkACFKey' => array(
+				'type' => 'string'
+			)
+		),
 		'textdomain' => 'what-im-reading',
 		'editorScript' => 'file:./index.js',
 		'editorStyle' => 'file:./index.css',

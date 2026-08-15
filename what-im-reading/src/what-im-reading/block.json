@@ -18,6 +18,17 @@
 		},
 		"html": false
 	},
+	"attributes": {
+		"bookTitleACFKey": {
+			"type": "string"
+		},
+		"bookImageACFKey": {
+			"type": "string"
+		},
+		"bookLinkACFKey": {
+			"type": "string"
+		}
+	},
 	"textdomain": "what-im-reading",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
