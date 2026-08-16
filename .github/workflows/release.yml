@@ -18,7 +18,7 @@ jobs:
         type: 'zip'
         filename: 'what-im-reading.zip'
         directory: 'what-im-reading'
-        exclusions: '*.git* /*node_modules/* .editorconfig package.json package-lock.json /*src/* readme.txt'
+        exclusions: '*.git* /*node_modules/* .editorconfig package.json package-lock.json /*src/*'
     - name: Upload Release
       uses: ncipollo/release-action@v1.12.0
       with:

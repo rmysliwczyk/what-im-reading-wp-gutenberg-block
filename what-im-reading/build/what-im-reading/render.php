@@ -12,6 +12,7 @@
 ?>
 
 <?php
+	if ( ! defined( 'ABSPATH' ) ) exit;
 	$acf_active = is_plugin_active('advanced-custom-fields/acf.php');
 	if($acf_active) {
 		$post_id = get_the_ID();
@@ -44,16 +45,16 @@
 ?>
 
 <?php if ($acf_active): ?>
-	<section <?php echo get_block_wrapper_attributes(); ?>>
+	<section <?php echo wp_kses_data(get_block_wrapper_attributes()); ?>>
 		<h2>I'm currently reading:</h2>
 		<?php echo wp_get_attachment_image( $book_image, 'medium')?>
-		<p><?= esc_html($book_title) ?></p>
-		<a href="<?= esc_url($book_link_href)?>">
-			<?= esc_html($book_link_title)?>
+		<p><?php echo esc_html($book_title) ?></p>
+		<a href="<?php echo esc_url($book_link_href)?>">
+			<?php echo esc_html($book_link_title)?>
 		</a>
 	</section>
 <?php else: ?>
-	<section <?php echo get_block_wrapper_attributes(); ?>>
+	<section <?php echo wp_kses_data(get_block_wrapper_attributes()); ?>>
 		<p>ACF Plugin is required to use this block.</p>
 	</section>
 <?php endif; ?>
