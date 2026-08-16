@@ -92,7 +92,58 @@ function Edit({
       children: "Book Link"
     })
   });
-  (0,react__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
+  const postType = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_4__.useSelect)(select => select('core/editor').getCurrentPostType(), []);
+  const [meta] = (0,_wordpress_core_data__WEBPACK_IMPORTED_MODULE_5__.useEntityProp)('postType', postType, 'meta');
+  async function updatePreview() {
+    if (bookImageACFKey) {
+      console.log(bookImageACFKey);
+      let bookImage = acf.getFields({
+        name: bookImageACFKey
+      })[0]?.val();
+      const media = await (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_4__.resolveSelect)(_wordpress_core_data__WEBPACK_IMPORTED_MODULE_5__.store).getEntityRecord('postType', 'attachment', bookImage);
+      setPreviewFields(prev => ({
+        ...prev,
+        image: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("img", {
+          src: media?.media_details?.sizes?.medium?.source_url
+        })
+      }));
+    }
+    if (bookTitleACFKey) {
+      let bookTitle = acf.getFields({
+        name: bookTitleACFKey
+      })[0]?.val();
+      setPreviewFields(prev => ({
+        ...prev,
+        text: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("p", {
+          children: bookTitle
+        })
+      }));
+    }
+    if (bookLinkACFKey) {
+      let bookLink = acf.getFields({
+        name: bookLinkACFKey
+      })[0]?.val();
+      let bookLinkHref;
+      let bookLinkTitle;
+      if (bookLink.url) {
+        /* Link Return Type: 'Link Array' */
+        bookLinkHref = bookLink.url;
+        bookLinkTitle = bookLink.title ? bookLink.title : bookLinkHref;
+      } else {
+        /* Link Return Type: 'Link URL' */
+        bookLinkHref = bookLink;
+        bookLinkTitle = bookLink;
+      }
+      setPreviewFields(prev => ({
+        ...prev,
+        link: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("a", {
+          href: bookLinkHref,
+          children: bookLinkTitle
+        })
+      }));
+    }
+  }
+  ;(0,react__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
     if (typeof acf !== 'undefined') {
       setACFFields({
         text: acf.getFields({
@@ -119,55 +170,13 @@ function Edit({
     }
   }, []);
   (0,react__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
-    async function updatePreview() {
-      if (bookImageACFKey) {
-        console.log(bookImageACFKey);
-        let bookImage = acf.getFields({
-          name: bookImageACFKey
-        })[0]?.val();
-        const media = await (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_4__.resolveSelect)(_wordpress_core_data__WEBPACK_IMPORTED_MODULE_5__.store).getEntityRecord('postType', 'attachment', bookImage);
-        setPreviewFields(prev => ({
-          ...prev,
-          image: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("img", {
-            src: media?.media_details?.sizes?.medium?.source_url
-          })
-        }));
-      }
-      if (bookTitleACFKey) {
-        let bookTitle = acf.getFields({
-          name: bookTitleACFKey
-        })[0]?.val();
-        setPreviewFields(prev => ({
-          ...prev,
-          text: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("p", {
-            children: bookTitle
-          })
-        }));
-      }
-      if (bookLinkACFKey) {
-        let bookLink = acf.getFields({
-          name: bookLinkACFKey
-        })[0]?.val();
-        let bookLinkHref;
-        let bookLinkTitle;
-        if (bookLink.url) {
-          /* Link Return Type: 'Link Array' */
-          bookLinkHref = bookLink.url;
-          bookLinkTitle = bookLink.title ? bookLink.title : bookLinkHref;
-        } else {
-          /* Link Return Type: 'Link URL' */
-          bookLinkHref = bookLink;
-          bookLinkTitle = bookLink;
-        }
-        setPreviewFields(prev => ({
-          ...prev,
-          link: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("a", {
-            href: bookLinkHref,
-            children: bookLinkTitle
-          })
-        }));
+    if (typeof acf !== 'undefined') {
+      if (meta._acf_changed != false) {
+        updatePreview();
       }
     }
+  }, [meta]);
+  (0,react__WEBPACK_IMPORTED_MODULE_6__.useEffect)(() => {
     updatePreview();
   }, [bookTitleACFKey, bookImageACFKey, bookLinkACFKey]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.Fragment, {
