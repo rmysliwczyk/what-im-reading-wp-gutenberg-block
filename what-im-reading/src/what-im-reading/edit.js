@@ -30,8 +30,8 @@ import './editor.scss';
 
 import { Panel, PanelBody, PanelRow } from '@wordpress/components';
 import { SelectControl } from '@wordpress/components';
-import { resolveSelect } from '@wordpress/data';
-import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect, resolveSelect } from '@wordpress/data';
+import { store as coreDataStore, useEntityProp } from '@wordpress/core-data';
 import { useState, useEffect } from 'react';
 
 export default function Edit({attributes, setAttributes}) {
@@ -46,6 +46,42 @@ export default function Edit({attributes, setAttributes}) {
 			link: <a href='#'>Book Link</a>
 		}
 	)
+	const postType = useSelect(
+		( select ) => select( 'core/editor' ).getCurrentPostType(),
+		[]
+	);
+	const [meta] = useEntityProp('postType', postType, 'meta')
+
+	async function updatePreview() {
+		if (bookImageACFKey) {
+			console.log(bookImageACFKey)
+			let bookImage = acf.getFields({name: bookImageACFKey})[0]?.val();
+			const media = await resolveSelect(coreDataStore).getEntityRecord('postType', 'attachment', bookImage)
+			setPreviewFields((prev) => ({...prev, image: <img src={media?.media_details?.sizes?.medium?.source_url}/>}))
+		}
+
+		if (bookTitleACFKey) {
+			let bookTitle = acf.getFields({name: bookTitleACFKey})[0]?.val();
+			setPreviewFields((prev) => ({...prev, text: <p>{bookTitle}</p>}))
+		}
+
+		if (bookLinkACFKey) {
+			let bookLink = acf.getFields({name: bookLinkACFKey})[0]?.val();
+
+			let bookLinkHref
+			let bookLinkTitle
+			if (bookLink.url) {
+				/* Link Return Type: 'Link Array' */
+				bookLinkHref = bookLink.url
+				bookLinkTitle = bookLink.title ? bookLink.title : bookLinkHref
+			} else {
+				/* Link Return Type: 'Link URL' */
+				bookLinkHref = bookLink
+				bookLinkTitle = bookLink
+			}
+			setPreviewFields((prev) => ({...prev, link: <a href={bookLinkHref}>{bookLinkTitle}</a>}))
+		}
+	}
 
 	useEffect(() => {
 		if (typeof acf !== 'undefined') {
@@ -54,45 +90,22 @@ export default function Edit({attributes, setAttributes}) {
 				image: acf.getFields({type: 'image'}).map((field) => ({label: field.data.name, value: field.data.name})),
 				link: acf.getFields({type: 'link'}).map((field) => ({label: field.data.name, value: field.data.name}))
 			})
+
 		} else {
 			setErrorMessage('ACF Plugin is required to use this block.');
 		}
 	},[])
 
 	useEffect(() => {
-		async function updatePreview() {
-			if (bookImageACFKey) {
-				console.log(bookImageACFKey)
-				let bookImage = acf.getFields({name: bookImageACFKey})[0]?.val();
-				const media = await resolveSelect(coreDataStore).getEntityRecord('postType', 'attachment', bookImage)
-				setPreviewFields((prev) => ({...prev, image: <img src={media?.media_details?.sizes?.medium?.source_url}/>}))
-			}
-
-			if (bookTitleACFKey) {
-				let bookTitle = acf.getFields({name: bookTitleACFKey})[0]?.val();
-				setPreviewFields((prev) => ({...prev, text: <p>{bookTitle}</p>}))
-			}
-
-			if (bookLinkACFKey) {
-				let bookLink = acf.getFields({name: bookLinkACFKey})[0]?.val();
-
-				let bookLinkHref
-				let bookLinkTitle
-				if (bookLink.url) {
-					/* Link Return Type: 'Link Array' */
-					bookLinkHref = bookLink.url
-					bookLinkTitle = bookLink.title ? bookLink.title : bookLinkHref
-				} else {
-					/* Link Return Type: 'Link URL' */
-					bookLinkHref = bookLink
-					bookLinkTitle = bookLink
-				}
-				setPreviewFields((prev) => ({...prev, link: <a href={bookLinkHref}>{bookLinkTitle}</a>}))
+		if (typeof acf !== 'undefined') {
+			if(meta._acf_changed != false) {
+				updatePreview()
 			}
 		}
+	},[meta])
 
+	useEffect(() => {
 		updatePreview()
-
 	},[bookTitleACFKey, bookImageACFKey, bookLinkACFKey])
 
 	return (

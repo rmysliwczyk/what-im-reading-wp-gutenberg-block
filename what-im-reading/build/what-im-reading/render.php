@@ -12,9 +12,11 @@
 ?>
 
 <?php
-	$book_title = get_field($attributes['bookTitleACFKey']);
-	$book_image = get_field($attributes['bookImageACFKey']);
-	$book_link = get_field($attributes['bookLinkACFKey']);
+	$post_id = get_the_ID();
+
+	$book_title = get_field($attributes['bookTitleACFKey'], $post_id);
+	$book_image = get_field($attributes['bookImageACFKey'], $post_id);
+	$book_link = get_field($attributes['bookLinkACFKey'], $post_id);
 
 	if(is_array($book_image)) {
 		/* Image Return Type: 'Image Array' */
