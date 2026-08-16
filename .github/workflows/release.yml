@@ -1,8 +1,8 @@
 name: Release
 on:
   push:
-    branches:
-      - 'main'
+    tags:
+      - 'v*'
 
 permissions:
   contents: write
@@ -19,12 +19,9 @@ jobs:
         filename: 'what-im-reading.zip'
         directory: 'what-im-reading'
         exclusions: '*.git* /*node_modules/* .editorconfig package.json package-lock.json /*src/* readme.txt'
-    - name: 'Set outputs'
-      id: vars
-      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
     - name: Upload Release
       uses: ncipollo/release-action@v1.12.0
       with:
         artifacts: "what-im-reading/what-im-reading.zip"
-        tag: ${{ steps.vars.outputs.sha_short }}
+        tag: ${{ github.ref_name }}
         token: ${{ secrets.GITHUB_TOKEN }}
