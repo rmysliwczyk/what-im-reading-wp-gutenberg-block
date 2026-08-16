@@ -3,6 +3,7 @@ This repository holds code for *What I'm Reading*, my WordPress plugin, which ad
 
 Watch a brief video feature presentation here where I showcase the main features: [What I'm Reading - Wordpress Plugin - Feature Presentation](https://youtu.be/hHB3TX7Prdw)
 
+[![](/what-im-reading/assets/screenshot-1.png)](https://www.youtube.com/watch?v=hHB3TX7Prdw&feature=youtu.be)
 ## Highlights
 - ACF fields' values are displayed in the editor, to allow for dynamic WYSIWIG experience.
 - Handling of different ACF fields' *Return Formats* for better user experience.
