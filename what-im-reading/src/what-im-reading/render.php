@@ -12,38 +12,48 @@
 ?>
 
 <?php
-	$post_id = get_the_ID();
+	$acf_active = is_plugin_active('advanced-custom-fields/acf.php');
+	if($acf_active) {
+		$post_id = get_the_ID();
 
-	$book_title = get_field($attributes['bookTitleACFKey'], $post_id);
-	$book_image = get_field($attributes['bookImageACFKey'], $post_id);
-	$book_link = get_field($attributes['bookLinkACFKey'], $post_id);
+		$book_title = get_field($attributes['bookTitleACFKey'], $post_id);
+		$book_image = get_field($attributes['bookImageACFKey'], $post_id);
+		$book_link = get_field($attributes['bookLinkACFKey'], $post_id);
 
-	if(is_array($book_image)) {
-		/* Image Return Type: 'Image Array' */
-		$book_image = $book_image['id'];
-	} elseif (wp_http_validate_url($book_image)) {
-		/* Image Return Type: 'Image URL' */
-		$book_image = attachment_url_to_postid($book_image);
-	} else {
-		/* Image Return Type: 'Image ID' */
-		/* $book_image already is ID */
-	}
+		if(is_array($book_image)) {
+			/* Image Return Type: 'Image Array' */
+			$book_image = $book_image['id'];
+		} elseif (wp_http_validate_url($book_image)) {
+			/* Image Return Type: 'Image URL' */
+			$book_image = attachment_url_to_postid($book_image);
+		} else {
+			/* Image Return Type: 'Image ID' */
+			/* $book_image already is ID */
+		}
 
-	if(is_array($book_link)) {
-		/* Link Return Type: 'Link Array' */
-		$book_link_href = $book_link['url'] ?:'#';
-		$book_link_title = $book_link['title'] ?: $book_link_href;
-	} else {
-		/* Link Return Type: 'Link URL' */
-		$book_link_href = $book_link;
-		$book_link_title = $book_link_href;
+		if(is_array($book_link)) {
+			/* Link Return Type: 'Link Array' */
+			$book_link_href = $book_link['url'] ?:'#';
+			$book_link_title = $book_link['title'] ?: $book_link_href;
+		} else {
+			/* Link Return Type: 'Link URL' */
+			$book_link_href = $book_link;
+			$book_link_title = $book_link_href;
+		}
 	}
 ?>
-<section <?php echo get_block_wrapper_attributes(); ?>>
-	<h2>I'm currently reading:</h2>
-	<?php echo wp_get_attachment_image( $book_image, 'medium')?>
-	<p><?= esc_html($book_title) ?></p>
-	<a href="<?= esc_url($book_link_href)?>">
-		<?= esc_html($book_link_title)?>
-	</a>
-</section>
+
+<?php if ($acf_active): ?>
+	<section <?php echo get_block_wrapper_attributes(); ?>>
+		<h2>I'm currently reading:</h2>
+		<?php echo wp_get_attachment_image( $book_image, 'medium')?>
+		<p><?= esc_html($book_title) ?></p>
+		<a href="<?= esc_url($book_link_href)?>">
+			<?= esc_html($book_link_title)?>
+		</a>
+	</section>
+<?php else: ?>
+	<section <?php echo get_block_wrapper_attributes(); ?>>
+		<p>ACF Plugin is required to use this block.</p>
+	</section>
+<?php endif; ?>
