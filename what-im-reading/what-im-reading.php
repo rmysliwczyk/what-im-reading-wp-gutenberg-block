@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name:       What I&#39;m Reading
- * Plugin URI:        mysliwczykrafal.pl
- * Description:       ACF WordPress Gutenberg block that shows what book the author is currently reading. 
- * Version:           0.1.0
+ * Plugin URI:        https://mysliwczykrafal.pl
+ * Description:       ACF WordPress Gutenberg block that shows what book the author is currently reading.
+ * Version:           1.0.2
  * Requires at least: 6.8
  * Requires PHP:      7.4
  * Author:            Rafał Myśliwczyk

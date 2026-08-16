@@ -5,7 +5,7 @@ return array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
 		'apiVersion' => 3,
 		'name' => 'what-im-reading/what-im-reading',
-		'version' => '0.1.0',
+		'version' => '1.0.2',
 		'title' => 'What I\'m Reading',
 		'category' => 'design',
 		'icon' => 'book',
